@@ -23,9 +23,8 @@ int main (int argc, char** argv)
         for (struct addrinfo * i = res; i != NULL; i = i->ai_next)
         {
                 char host[NI_MAXHOST];
-                char serv[NI_MAXSERV];
 
-                getnameinfo(i->ai_addr, i->ai_addrlen, host, NI_MAXHOST, serv, NI_MAXSERV, NI_NUMERICHOST);
+                getnameinfo(i->ai_addr, i->ai_addrlen, host, NI_MAXHOST, NULL, 0, NI_NUMERICHOST);
                 std::cout << host << " " << i->ai_family << "   " << i->ai_socktype << std::endl;
         }
 
