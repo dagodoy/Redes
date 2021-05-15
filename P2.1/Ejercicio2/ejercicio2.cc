@@ -48,15 +48,15 @@ int main (int argc, char** argv)
 
 		int bytes = recvfrom(sd, (void *) buffer, 79, 0, &client, &clientlen);
 		buffer[bytes] = '\0';
-
+		buffer[strcspn(buffer, "\n")] = '\0';
                 getnameinfo(&client, clientlen, host, NI_MAXHOST, serv, NI_MAXSERV, NI_NUMERICHOST | NI_NUMERICSERV);
-                std::cout << bytes << " bytes de " << host << ":" << serv << " " << strcmp(buffer, "t\n")<< std::endl;
+                std::cout << bytes << " bytes de " << host << ":" << serv << std::endl;
 
 		if (bytes == -1)
 		{
 			return -1;
 		}
-		if (strcmp(buffer, "t\n") == 0)
+		if (strcmp(buffer, "t") == 0)
 		{
 			memset(timebuffer, 0, sizeof timebuffer);	
 			time(&timesec);
@@ -64,7 +64,7 @@ int main (int argc, char** argv)
 			strftime(timebuffer, sizeof timebuffer,"%X %p", ftime);
 			sendto(sd, timebuffer, sizeof timebuffer, 0, &client, clientlen); 
 		}
-		else if (strcmp(buffer, "d\n") == 0)
+		else if (strcmp(buffer, "d") == 0)
 		{
 			memset(timebuffer, 0, sizeof timebuffer);
 			time(&timesec);	
@@ -72,7 +72,7 @@ int main (int argc, char** argv)
 			strftime(timebuffer, sizeof timebuffer,"%F", ftime);
 			sendto(sd, timebuffer, sizeof timebuffer, 0, &client, clientlen); 
 		}
-		else if (strcmp(buffer, "q\n") == 0)
+		else if (strcmp(buffer, "q") == 0)
 		{ 
 			std::cout << "Saliendo..." << std::endl;
 			close(sd);	
