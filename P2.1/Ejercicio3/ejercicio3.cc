@@ -33,6 +33,7 @@ int main (int argc, char** argv)
 	if (send == -1)
 	{	
 		std::cerr << "[sendto]: error al enviar mensaje" << std::endl;
+		return -1;
 	}
 
 	char buffer[80];	
