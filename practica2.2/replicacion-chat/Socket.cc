@@ -7,6 +7,23 @@ Socket::Socket(const char * address, const char * port):sd(-1)
 {
     //Construir un socket de tipo AF_INET y SOCK_DGRAM usando getaddrinfo.
     //Con el resultado inicializar los miembros sd, sa y sa_len de la clase
+        struct addrinfo hints;
+        struct addrinfo * res;
+
+        memset ((void*) &hints, 0, sizeof(struct addrinfo));
+        hints.ai_family = AF_INET;
+        hints.ai_socktype = SOCK_DGRAM;
+
+        int rc = getaddrinfo(address, port, &hints, &res);
+        if (rc != 0)
+        {
+                std::cerr << "[getaddrinfo]: " << gai_strerror(rc) << std::endl;
+        }
+
+        sd = socket(res->ai_family, res->ai_socktype, 0);
+	sa = *res->ai_addr;
+	sa_len = res->ai_addrlen;
+	freeaddrinfo(res);
 }
 
 int Socket::recv(Serializable &obj, Socket * &sock)
@@ -37,6 +54,17 @@ int Socket::send(Serializable& obj, const Socket& sock)
 {
     //Serializar el objeto
     //Enviar el objeto binario a sock usando el socket sd
+    obj.to_bin();
+
+    ssize_t bytes = ::sendto(sd, obj.data(), obj.size(), 0, &sock.sa, sock.sa_len);
+
+    if (bytes <= 0)
+    {
+	return -1;
+    }
+
+    return 0;
+
 }
 
 bool operator== (const Socket &s1, const Socket &s2)
@@ -44,6 +72,15 @@ bool operator== (const Socket &s1, const Socket &s2)
     //Comparar los campos sin_family, sin_addr.s_addr y sin_port
     //de la estructura sockaddr_in de los Sockets s1 y s2
     //Retornar false si alguno difiere
+    struct sockaddr_in addr1, addr2;
+    socklen_t len1 = sizeof(struct sockaddr_in), len2 = sizeof(struct sockaddr_in);
+    
+    getsockname(s1.sd, (struct sockaddr *)&addr1, &len1);
+    getsockname(s2.sd, (struct sockaddr *)&addr2, &len2);
+    
+    return (addr1.sin_family == addr2.sin_family && 
+	    addr1.sin_addr.s_addr == addr2.sin_addr.s_addr &&
+	    addr1.sin_port == addr2.sin_port);
 };
 
 std::ostream& operator<<(std::ostream& os, const Socket& s)
