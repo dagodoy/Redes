@@ -8,7 +8,6 @@ int main(int argc, char **argv)
     std::thread net_thread([&ec](){ ec.net_thread(); });
 
     ec.login();
-
     ec.input_thread();
 }
 

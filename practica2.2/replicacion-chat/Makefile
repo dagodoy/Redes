@@ -1,11 +1,11 @@
-CC=g++
+C=g++
 CFLAGS=-g -I.
 DEPS = Socket.h Chat.h
 OBJ = Socket.o Chat.o
 LIBS=-lpthread
 
 %.o: %.cc $(DEPS)
-	$(CC) -g -c -o $@ $< $(CFLAGS)
+	$(CC) -g -c -std=c++11 -o $@ $< $(CFLAGS)
 
 all: cs cc
 

@@ -45,7 +45,9 @@ int Socket::recv(Serializable &obj, Socket * &sock)
     {
         sock = new Socket(&sa, sa_len);
     }
+
     obj.from_bin(buffer);
+
     return 0;
 }
 
@@ -71,12 +73,15 @@ bool operator== (const Socket &s1, const Socket &s2)
     //Comparar los campos sin_family, sin_addr.s_addr y sin_port
     //de la estructura sockaddr_in de los Sockets s1 y s2
     //Retornar false si alguno difiere
-    struct sockaddr_in* addr1 = (struct sockaddr_in*) &(s1.sa);
-    struct sockaddr_in* addr2 = (struct sockaddr_in*) &(s2.sa);
+    struct sockaddr_in addr1, addr2;
+    socklen_t len1 = sizeof(struct sockaddr_in), len2 = sizeof(struct sockaddr_in);
     
-    return (addr1->sin_family == addr2->sin_family && 
-	    addr1->sin_addr.s_addr == addr2->sin_addr.s_addr &&
-	    addr1->sin_port == addr2->sin_port);
+    getsockname(s1.sd, (struct sockaddr *)&addr1, &len1);
+    getsockname(s2.sd, (struct sockaddr *)&addr2, &len2);
+    
+    return (addr1.sin_family == addr2.sin_family && 
+	    addr1.sin_addr.s_addr == addr2.sin_addr.s_addr &&
+	    addr1.sin_port == addr2.sin_port);
 };
 
 std::ostream& operator<<(std::ostream& os, const Socket& s)
